@@ -33,16 +33,16 @@ a, a:hover, a:visited, a:active { text-decoration: none; color: #eee; }
 .content-stage { display: none;  }
 .content-stage h2 { color: #eee; }
 .titleSegmentContainer h2 { float: left; font-size: 1.2em; }
-.titleSegmentContainer .readings { float: right; margin-right: .5em; font-size: 1.2em; font-family: "Segoe UI Light", "Open Sans", Tahoma, Arial, Helvetica; }
+.titleSegmentContainer .readings { float: right; margin-right: 1em; font-size: 1.2em; font-family: "Segoe UI Light", "Open Sans", Tahoma, Arial, Helvetica; }
 
 /*
  * Media queries for adaptive layouts */
 
 @media (min-width: 968px) {
-    #wallpaper-left { position: fixed; top: 0; bottom: 0; right: 50%; margin-right: 28em; width: 100em; background-color: #303030; }
-    #wallpaper-right { position: fixed; top: 0; bottom: 0; left: 50%; margin-left: 28em; width: 100em; background-color: #303030; border-left: 1px solid #d0d0d0; }
-    #wrapper { width: 56em; margin: 0px auto; }
-    #header { position: fixed; right: 50%; margin-right: -28em; top: 0; width: 43.75em; z-index: 3; } 
+    #wallpaper-left { position: fixed; top: 0; bottom: 0; right: 50%; margin-right: 26em; width: 100em; background-color: #303030; }
+    #wallpaper-right { position: fixed; top: 0; bottom: 0; left: 50%; margin-left: 26em; width: 100em; background-color: #303030; border-left: 1px solid #d0d0d0; }
+    #wrapper { width: 52em; margin: 0px auto; }
+    #header { position: fixed; right: 50%; margin-right: -26em; top: 0; width: 39.75em; z-index: 3; } 
     #navigation {
         padding: .5em; 
         border-left: 2px solid #d0d0d0; 
@@ -53,27 +53,28 @@ a, a:hover, a:visited, a:active { text-decoration: none; color: #eee; }
         top: 0; 
         left: 50%;
         width: 10.5em; 
-        margin-left: -28em;
+        margin-left: -26em;
         background-color: #0F74CA; 
     }
-    #content { position: absolute; left: 13em; top: 0; right: 0; bottom: 0; padding-top: 3em; }
+    #content { position: absolute; left: 12.5em; top: 0; width: 40em; bottom: 0; padding-top: 3em; }
 }
 
 @media (max-width: 967px) {
     #wrapper { width: 20em; margin: 0px auto; border-left: 1px solid #d0d0d0; border-right: 1px solid #d0d0d0; }
     #wallpaper-left { position: fixed; top: 0; bottom: 0; right: 50%; margin-right: 10em; width: 100em; background-color: #303030; }
     #wallpaper-right { position: fixed; top: 0; bottom: 0; left: 50%; margin-left: 10em; width: 100em; background-color: #303030; }
+    #header h3 { float: none; }
     #navigation {
         background-color: #0f74ca;
         padding: 0 .5em 0 .5em;
         border-top: 2px solid #d0d0d0;
         border-bottom: 2px solid #d0d0d0;
     }
-    #navigation ul { width: 24em; }
+    #navigation ul { width: 24em; padding-left: 4.5em;}
     #navigation li { float: left; margin-bottom: 0; margin-right: 2em; padding-top: .75em; padding-bottom: .75em; width: 0; overflow: hidden;}
     .content-stage { padding: .5em; }
-    .titleSegmentContainer { height: 4em; }
+    .titleSegmentContainer { height: 4em; text-align: center; }
     .titleSegmentContainer h2 { float: none; margin-bottom: .25em; }
-    .titleSegmentContainer .readings { float: none; font-size: 1em; }
+    .titleSegmentContainer .readings { float: none; font-size: 1em; margin-right: 0; }
     .graphContainer { width: 19em; }
 }
