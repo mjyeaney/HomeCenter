@@ -91,14 +91,14 @@ var Controller = function(msgBus){
     };
 
     var displayOverview = function(data){
+        var inTemp = getTempReading(),
+            outTemp = getTempReading(),
+            inHumid = getTempReading(),
+            outHumid = getTempReading();
+        
         hideAllContent();
         _host('#content #overview').show();
-
-        var inTemp = getTempReading();
-        var outTemp = getTempReading();
         _host('#overview #tempOverview .readings').html(inTemp + '&deg; / ' + outTemp + '&deg;');
-        var inHumid = getTempReading();
-        var outHumid = getTempReading();
         _host('#overview #humidOverview .readings').text(inHumid + '% / ' + outHumid + '%');
 
         // make some BS charts
