@@ -40,6 +40,7 @@ var MessageBus = function(){
                     _listeners[j](msg, data);
                 } catch (ex){
                     // nothing - trace?
+                    console.log('ERROR: ' + ex)
                 }
             }
        }, 0);
@@ -53,15 +54,15 @@ var DataModel = function(msgBus){
     var _msgMap = {};
 
     var loadOverview = function(callback){
-        $.ajax({
-            type : 'GET',
-            cache : false,
-            url : '/data/overview.json',
-            dataType : 'json',
-            success : function(result){
-                _bus.Send(MessageTypes.Data.OverviewLoaded, result);
-            }
-        });
+        // $.ajax({
+        //     type : 'GET',
+        //     cache : false,
+        //     url : '/data/overview.json',
+        //     dataType : 'json',
+        //     success : function(result){
+                _bus.Send(MessageTypes.Data.OverviewLoaded, null);
+        //    }
+        //});
     };
 
     this.OnMessage = function(msg, data){
