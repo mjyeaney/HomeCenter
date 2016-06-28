@@ -1,9 +1,0 @@
-{
-    "Sensors" : [
-        {
-            "Name" : "Interior temp",
-            "Type" : "Temperature",
-            "Current" : 68.658
-        }
-    ]
-}
