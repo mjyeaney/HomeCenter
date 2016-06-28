@@ -80,6 +80,5 @@ Write-Host "INFO: Starting web app..."
 Start-AzureRmWebApp -ResourceGroupName $rgName -Name $appName
 
 #
-# TODO: At this point, we should have an app. 
-# Next, we need to configure GIT publishing, .NET runtime state, logging, etc.
+# TODO: Remaining setup: EvenHub namespace, Stream Analytics Job (from JSON file)
 #
