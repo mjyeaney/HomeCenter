@@ -166,7 +166,7 @@ var Controller = function(msgBus){
     _bus.Register(_self.OnMessage);
 };
 
-/* Startup */
+/* Startup + bootstrap */
 $(function(){
     var bus = new MessageBus();
     var data = new DataModel(bus);
