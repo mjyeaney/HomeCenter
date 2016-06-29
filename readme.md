@@ -1,35 +1,24 @@
 Overview
 --------
 
-The purpose of this project is a simple home monitoring solution, measuring tempurature, humidity, and heating zone
-activity. This data should be available via web (mobile and desktop formats).
+The purpose of this project is to demonstrate a simple home monitoring solution, measuring tempurature, humidity, and heating zone activity. This data is processed via Azure EventHubs[1] and Stream Analytics[2], and presented via a simple web interface.
 
 High-level Architecture
 -----------------------
 
 There are 3 main pieces to this system:
 
-+ Local agent to sample data from sensing hardware and create data files
-+ Local agent to upload data files into persistent storage.
-+ Remote web agent to display aggregates of this data.
++ Local agent to to simulate connected sensors and send data.
++ Stream Analytics transform job to window the data streams.
++ Web application to display real-time updates of windowed data.
 
-While the first two local agents could be combined into one process, the goal here is to keep the individual components
-as small and independent as possible.
+Here's a screenshot of the web application in action:
 
-In order to keep the application responsive under load, the data will not be queried in real-time. Instead, one of the
-available web servers will elect to become a background scheduler, generating static files for use by the UI. Primarily,
-this consists of generating graphs for each sensor type at each target resolution (daily, weekly, monthly, yearly), for
-each media format (wide, large, mobile).
-
-Componenet Usage
-----------------
-
-+ Graphing: ZedGraph [1] 
-+ I/O interfacing: Phidget libraries [2]
+![Screenshot](screenshot.png)
 
 References
 ----------
 
-[1]: http://sourceforge.net/projects/zedgraph/
-[2]: http://www.phidgets.com/
+[1]: https://azure.microsoft.com/en-us/services/event-hubs/
+[2]: https://azure.microsoft.com/en-us/services/stream-analytics/
 
