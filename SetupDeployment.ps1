@@ -50,18 +50,20 @@ if ($storageExists -eq $false){
 #
 # Setup CORS access to the account
 #
-$storageKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $rgName -StorageAccountName $storageName)[0].Value
-$storageContext = New-AzureStorageContext -StorageAccountKey $storageKey -StorageAccountName $storageName
-$CorsRules = (@{
-    AllowedHeaders=@("*");
-    AllowedOrigins=@("*");
-    ExposedHeaders=@("content-length");
-    MaxAgeInSeconds=200;
-    AllowedMethods=@("Get","Connect", "Head")})
-Set-AzureStorageCORSRule -ServiceType Blob -CorsRules $CorsRules -Context $storageContext
-$CORSrule = Get-AzureStorageCORSRule -ServiceType Blob -Context $storageContext
-echo "Current CORS rules: "
-echo $CORSrule
+if ($storageExists -eq $false){
+    $storageKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $rgName -StorageAccountName $storageName)[0].Value
+    $storageContext = New-AzureStorageContext -StorageAccountKey $storageKey -StorageAccountName $storageName
+    $CorsRules = (@{
+        AllowedHeaders=@("*");
+        AllowedOrigins=@("*");
+        ExposedHeaders=@("content-length");
+        MaxAgeInSeconds=200;
+        AllowedMethods=@("Get","Connect", "Head")})
+    Set-AzureStorageCORSRule -ServiceType Blob -CorsRules $CorsRules -Context $storageContext
+    $CORSrule = Get-AzureStorageCORSRule -ServiceType Blob -Context $storageContext
+    Log-Output "Current CORS rules:"
+    Log-Output $CORSrule
+}
 
 # 
 # Create app service environment
