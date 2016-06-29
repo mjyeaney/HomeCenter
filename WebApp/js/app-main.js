@@ -54,15 +54,53 @@ var DataModel = function(msgBus){
     var _msgMap = {};
 
     var loadOverview = function(callback){
-        // $.ajax({
-        //     type : 'GET',
-        //     cache : false,
-        //     url : '/data/overview.json',
-        //     dataType : 'json',
-        //     success : function(result){
-                _bus.Send(MessageTypes.Data.OverviewLoaded, null);
-        //    }
-        //});
+        var blobServiceUri = 'https://homecenter0628.blob.core.windows.net', 
+            container = 'mam',
+            now = new Date();
+
+        var year = now.getUTCFullYear(),
+            month = (now.getUTCMonth() + 1).toString().leftPad(2, '0'),
+            day = now.getUTCDate().toString().leftPad(2, '0'),
+            hour = now.getUTCHours().toString().leftPad(2, '0');
+
+        var lastHourDataPrefix = 'ouput/' + year + '/' + month + '/' + day + '/' + hour;
+        var searchUrl = blobServiceUri + '/' + container + '?restype=container&comp=list&prefix=' + lastHourDataPrefix;
+
+        // Find the file that matches this prefix (if any)
+        $.ajax({
+            type: 'GET',
+            cache: false,
+            url: searchUrl,
+            contentType : 'xml',
+            success: function(result){
+                var matches = result.documentElement.getElementsByTagName("Blob");
+                if (matches.length > 0){
+                    var downloadUri = matches[0].getElementsByTagName("Url")[0].textContent;
+
+                    $.ajax({
+                        type: 'GET',
+                        cache: false,
+                        url: downloadUri,
+                        contentType : 'text/plain',
+                        success: function(result){
+                            var lines = result.split('\n');
+                            var data = [];
+                            for (var i=0; i < lines.length; i++){
+                                data.push(JSON.parse(lines[i]));
+                            }
+                            _bus.Send(MessageTypes.Data.OverviewLoaded, data);
+                        }
+                    })
+                } else {
+                    console.log('No matches found for the current query');
+
+                    // Look for new data in 5 seconds
+                    setTimeout(function(){
+                        _bus.Send(MessageTypes.Data.LoadOverview);
+                    }, 5000);
+                }
+            }
+        })
     };
 
     this.OnMessage = function(msg, data){
@@ -80,54 +118,98 @@ var Controller = function(msgBus){
     var _host = null;
     var _msgMap = {};
 
-    var getTempReading = function(){
-        var rnd = Math.random() * 125.0;
-        var wp = Math.floor(rnd);
-        var fp = (rnd-wp).toString();
-        return wp.toString().leftPad(3) + '.' + fp.substr(2, 1);
-    };
-
     var hideAllContent = function(){
         _host('#content .content-stage').hide();
     };
 
     var displayOverview = function(data){
-        var inTemp = getTempReading(),
-            outTemp = getTempReading(),
-            inHumid = getTempReading(),
-            outHumid = getTempReading();
+        var avgTemp = data.reduce(function(p, c) { return p + c.temp; }, 0.0) / data.length,
+            tempData = data.reduce(function(p, c) { p.push(c.temp); return p;}, []),
+            avgHmdt = data.reduce(function(p, c) { return p + c.hmdt; }, 0.0) / data.length,
+            hmdtData = data.reduce(function(p, c) { p.push(c.hmdt); return p;}, []);
         
         hideAllContent();
         _host('#content #overview').show();
-        _host('#overview #tempOverview .readings').html(inTemp + '&deg; / ' + outTemp + '&deg;');
-        _host('#overview #humidOverview .readings').text(inHumid + '% / ' + outHumid + '%');
+        _host('#overview #tempOverview .readings').html('Avg: ' + avgTemp.toFixed(1) + '&deg;');
+        _host('#overview #humidOverview .readings').text('Avg: ' + avgHmdt.toFixed(1) + '%');
 
-        // make some BS charts
+        // make some charts
         new Highcharts.Chart({
-            chart: { renderTo: 'tempGraph', type: 'line', animation: false },
+            chart: {
+                renderTo: 'tempGraph', 
+                type: 'line', 
+                animation: false,
+                backgroundColor: 'rgb(245,245,245)'
+            },
             credits: { enabled: false },
             title: { text: null },
-            yAxis: { title: { text: null } },
+            plotOptions: {
+                column: { shadow: false },
+                spline: {
+                    shadow: false,
+                    marker: { radius: 0 }
+                },
+                line: {
+                    marker: { radius: 0 }
+                },
+                series: { enableMouseTracking: false }
+            },
+            xAxis: { gridLineWidth: 1, type: 'linear' },
+            yAxis: {
+                title: { text: '' },
+                endOnTick: true,
+                labels: {
+                    formatter: function () {
+                        return this.value; // Disable label shortening
+                    }
+                }
+            },
             legend: { enabled: false },
-            plotOptions: { series: { animation: false } } ,
             series: [
-                { name: 'Inside', data: [38.0, 32.0, 14.0, 15.6, 18.79, 21.0, 22.2, 38.0, 32.0, 14.0, 15.6, 18.79, 21.0, 22.6, 38.0, 32.0, 14.0, 15.6, 18.79, 21.0, 22.3, 25.0, 28.25, 23.2]},
-                { name: 'Outside', data: [68.0, 62.0, 64.0, 65.6, 68.79, 61.0, 62.3, 68.0, 62.0, 64.0, 65.6, 68.79, 61.0, 62.3, 68.0, 62.0, 64.0, 65.6, 68.79, 61.0, 62.3, 62.3, 61.0, 68.12]}
+                { animation: false, data: tempData},
             ]
         });
 
         new Highcharts.Chart({
-            chart: { renderTo: 'humidGraph', type: 'line', animation: false },
+            chart: {
+                renderTo: 'humidGraph', 
+                type: 'line', 
+                animation: false,
+                backgroundColor: 'rgb(245,245,245)'
+            },
             credits: { enabled: false },
             title: { text: null },
-            yAxis: { title: { text: null } },
+            plotOptions: {
+                column: { shadow: false },
+                spline: {
+                    shadow: false,
+                    marker: { radius: 0 }
+                },
+                line: {
+                    marker: { radius: 0 }
+                },
+                series: { enableMouseTracking: false }
+            },
+            xAxis: { gridLineWidth: 1, type: 'linear' },
+            yAxis: {
+                title: { text: '' },
+                endOnTick: true,
+                labels: {
+                    formatter: function () {
+                        return this.value; // Disable label shortening
+                    }
+                }
+            },
             legend: { enabled: false },
-            plotOptions: { series: { animation: false } } ,
             series: [
-                { name: 'Inside', data: [38.0, 32.0, 14.0, 15.6, 18.79, 21.0, 22.2, 38.0, 32.0, 14.0, 15.6, 18.79, 21.0, 22.6, 38.0, 32.0, 14.0, 15.6, 18.79, 21.0, 22.3, 25.0, 28.25, 23.2]},
-                { name: 'Outside', data: [68.0, 62.0, 64.0, 65.6, 68.79, 61.0, 62.3, 68.0, 62.0, 64.0, 65.6, 68.79, 61.0, 62.3, 68.0, 62.0, 64.0, 65.6, 68.79, 61.0, 62.3, 62.3, 61.0, 68.12]}
+                { animation: false, data: hmdtData}
             ]
         });
+
+        // Re-load data in 5 seconds
+        setTimeout(function(){
+            _bus.Send(MessageTypes.Data.LoadOverview);
+        }, 5000);
     };
 
     var displaySensors = function(data){
@@ -143,15 +225,15 @@ var Controller = function(msgBus){
     this.BindEvents = function(host){
         _host = host;
 
-        host('#navigation li:eq(0)').click(function(){
+        host('#navigation li:eq(0) a').click(function(){
             _bus.Send(MessageTypes.Data.LoadOverview);
         });
 
-        host('#navigation li:eq(1)').click(function(){
+        host('#navigation li:eq(1) a').click(function(){
             _bus.Send(MessageTypes.View.SensorsSelected);
         });
 
-        host('#navigation li:eq(2)').click(function(){
+        host('#navigation li:eq(2) a').click(function(){
             _bus.Send(MessageTypes.View.AlertsSelected);
         });
     };

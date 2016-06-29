@@ -20,7 +20,8 @@ var sendReadingData = function(){
     var deviceMessage = {
         hmdt: (25 + (Math.random() * 10)),
         temp: (65 + (Math.random() * 15)),
-        time: moment().toISOString()
+        device: 'ABC-123'
+        //time: moment().toISOString()
     }
 
     eventHubs.sendMessage({
@@ -28,12 +29,17 @@ var sendReadingData = function(){
         deviceId: 1,
     }).then(function(){
         console.log('LOG: Sent reading data [' + JSON.stringify(deviceMessage) + ']');
+
+        // Send next reading
+        setTimeout(function(){
+            sendReadingData();
+        }, 1000)
     }).fail(function(err){
         console.log('ERROR: ' + err);
     })
 };
 
 // Send a random sensor reading every second.
-setInterval(function(){
+setTimeout(function(){
     sendReadingData();
 }, 1000)
