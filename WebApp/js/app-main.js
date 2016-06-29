@@ -12,19 +12,20 @@ if (!String.prototype.leftPad) {
 
 var MessageTypes = {
     Data : {
-               LoadOverview: 0x0,
-               OverviewLoaded: 0x1,
-               LoadSensorList: 0x2,
-               SensorListLoaded: 0x3
-           },
+        LoadOverview: 0x0,
+        OverviewLoaded: 0x1,
+        LoadSensorList: 0x2,
+        SensorListLoaded: 0x3
+    },
     View : {
-               OverviewSelected: 0x4,
-               SensorsSelected: 0x5,
-               AlertsSelected: 0x6
-           }
+        OverviewSelected: 0x4,
+        SensorsSelected: 0x5,
+        AlertsSelected: 0x6,
+        NoDataFound: 0x7
+    }
 };
 
-/* Application Modules */ 
+/* Simple UI message bus */ 
 
 var MessageBus = function(){
     var _listeners = [];
@@ -47,6 +48,8 @@ var MessageBus = function(){
     };
 
 };
+
+/* Data model / methods */
 
 var DataModel = function(msgBus){
     var _bus = msgBus;
@@ -93,6 +96,7 @@ var DataModel = function(msgBus){
                     })
                 } else {
                     console.log('No matches found for the current query');
+                    _bus.Send(MessageTypes.View.NoDataFound);
 
                     // Look for new data in 5 seconds
                     setTimeout(function(){
@@ -111,6 +115,8 @@ var DataModel = function(msgBus){
     _msgMap[MessageTypes.Data.LoadOverview] = loadOverview;
     _bus.Register(_self.OnMessage);
 };
+
+/* Application controller */
 
 var Controller = function(msgBus){
     var _bus = msgBus;
@@ -222,6 +228,11 @@ var Controller = function(msgBus){
         _host('#content #alerts').show();
     };
 
+    var displayNoData = function(){
+        hideAllContent();
+        _host('#content #noData').show();
+    };
+
     this.BindEvents = function(host){
         _host = host;
 
@@ -246,10 +257,12 @@ var Controller = function(msgBus){
     _msgMap[MessageTypes.Data.OverviewLoaded] = displayOverview;
     _msgMap[MessageTypes.View.SensorsSelected] = displaySensors;
     _msgMap[MessageTypes.View.AlertsSelected] = displayAlerts; 
+    _msgMap[MessageTypes.View.NoDataFound] = displayNoData;
     _bus.Register(_self.OnMessage);
 };
 
 /* Startup + bootstrap */
+
 $(function(){
     var bus = new MessageBus();
     var data = new DataModel(bus);
