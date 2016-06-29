@@ -1,5 +1,4 @@
 ﻿{
-  "Id": "/subscriptions/1ccf360a-bc8b-4cbc-af07-b42fa6b6363a/resourceGroups/HomeCenter/providers/Microsoft.StreamAnalytics/streamingjobs/WeatherDataProcessor",
   "Location": "West US",
   "Name": "WeatherDataProcessor",
   "Properties": {
