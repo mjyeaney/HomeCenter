@@ -1,0 +1,91 @@
+﻿{
+  "Id": "/subscriptions/1ccf360a-bc8b-4cbc-af07-b42fa6b6363a/resourceGroups/HomeCenter/providers/Microsoft.StreamAnalytics/streamingjobs/WeatherDataProcessor",
+  "Location": "West US",
+  "Name": "WeatherDataProcessor",
+  "Properties": {
+    "CreatedDate": "2016-06-28T17:09:18.137Z",
+    "DataLocale": "en-US",
+    "Etag": "5003a4c1-24c5-4c07-b9a9-68219e764b54",
+    "EventsLateArrivalMaxDelayInSeconds": 5,
+    "EventsOutOfOrderMaxDelayInSeconds": 0,
+    "EventsOutOfOrderPolicy": "Adjust",
+    "Functions": [],
+    "Inputs": [
+      {
+        "Name": "RawSensorData",
+        "Properties": {
+          "DataSource": {
+            "Properties": {
+              "ConsumerGroupName": null,
+              "EventHubName": "sensordata",
+              "ServiceBusNamespace": "homecentertelem",
+              "SharedAccessPolicyKey": null,
+              "SharedAccessPolicyName": "StreamProcessor"
+            },
+            "Type": "Microsoft.ServiceBus/EventHub"
+          },
+          "Diagnostics": null,
+          "Etag": "0bfbff02-3920-40a1-b8e7-0a5f2a80ed4d",
+          "Serialization": {
+            "Properties": {
+              "Encoding": "UTF8",
+              "Format": null
+            },
+            "Type": "Json"
+          },
+          "Type": "Stream"
+        }
+      }
+    ],
+    "JobId": "f0ebb095-c225-4650-9823-207dc4fce79e",
+    "JobState": "Stopped",
+    "LastOutputEventTime": "2016-06-29T03:53:15Z",
+    "Outputs": [
+      {
+        "Name": "WindowedSensorData",
+        "Properties": {
+          "DataSource": {
+            "Properties": {
+              "Container": "mam",
+              "DateFormat": "yyyy/MM/dd",
+              "PathPattern": "ouput/{date}/{time}",
+              "StorageAccounts": [
+                {
+                  "AccountKey": null,
+                  "AccountName": "homecenter0628"
+                }
+              ],
+              "TimeFormat": "HH"
+            },
+            "Type": "Microsoft.Storage/Blob"
+          },
+          "Diagnostics": null,
+          "Etag": "8d642314-a4ff-4c81-9023-0833538c9765",
+          "Serialization": {
+            "Properties": {
+              "Encoding": "UTF8",
+              "Format": "LineSeparated"
+            },
+            "Type": "Json"
+          }
+        }
+      }
+    ],
+    "OutputStartMode": "JobStartTime",
+    "OutputStartTime": "2016-06-29T03:30:44.727Z",
+    "ProvisioningState": "Succeeded",
+    "Sku": {
+      "Name": "Standard"
+    },
+    "Transformation": {
+      "Name": "Transformation",
+      "Properties": {
+        "Etag": "389195e0-b105-44df-bda6-c030071b6392",
+        "Query": "SELECT  max(hmdt) as hmdt, \r\n        max(temp) as temp, \r\n        device,\r\n        0 as minTemp, \r\n        150 as maxTemp, \r\n        75 as targetTemp, \r\n        0 as minHmdt,\r\n        100 as maxHmdt, \r\n        35 as targetHmdt \r\nINTO\r\n    [WindowedSensorData]\r\nFROM\r\n    [RawSensorData]\r\nGROUP BY TUMBLINGWINDOW(ss, 15), device",
+        "StreamingUnits": 1
+      }
+    }
+  },
+  "Tags": null,
+  "Type": "Microsoft.StreamAnalytics/streamingjobs"
+}
