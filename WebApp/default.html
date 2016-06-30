@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, height=device-height" />
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet" type="text/css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet" type="text/css">
         <link rel="stylesheet" type="text/css" href="styles/main.css" />
         <title>Home Center</title>
     </head>
@@ -24,19 +24,17 @@
 
             <div id="content">
                 <div id="overview" class="content-stage">
-                    <div class="titleSegmentContainer" id="tempOverview">
-                        <h2>Temperature</h2>
-                        <div class="readings"></div>
-                        <div class="clearFix"></div>
-                    </div>
-                    <div id="tempGraph" class="graphContainer"></div>
+                    <h2>Temperature</h2>
+                    <div id="tempGraph" class="graphContainer fLeft"></div>
+                    <div id="tempGauge" class="gaugeContainer fRight"></div>
 
-                    <div class="titleSegmentContainer" id="humidOverview">
-                        <h2>Humidity</h2>
-                        <div class="readings"></div>
-                        <div class="clearFix"></div>
-                    </div>
-                    <div id="humidGraph" class="graphContainer"></div>
+                    <div class="clearFix"></div>
+
+                    <h2>Humidity</h2>
+                    <div id="humidGraph" class="graphContainer fLeft"></div>
+                    <div id="hmdtGauge" class="gaugeContainer fRight"></div>
+
+                    <div class="clearFix"></div>
                 </div>
 
                 <div id="noData" class="content-stage">
@@ -51,7 +49,9 @@
         </div>
 
         <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
-        <script type="text/javascript" src="js/highcharts.js"></script>
+        <script type="text/javascript" src="//code.highcharts.com/highcharts.js"></script>
+        <script src="//code.highcharts.com/highcharts-more.js"></script>
+        <script src="//code.highcharts.com/modules/solid-gauge.js"></script>
         <script type="text/javascript" src="js/app-main.js"></script>
     </body>
 </html>

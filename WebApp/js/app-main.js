@@ -1,5 +1,6 @@
-/* Extensions / prototypes */
-
+//
+// Extensions / prototypes
+//
 if (!String.prototype.leftPad) {
     String.prototype.leftPad = function(length, chr){
         if (this.length >= length) return this;
@@ -8,8 +9,9 @@ if (!String.prototype.leftPad) {
     };
 }
 
-/* Global constants, resources, etc. */
-
+//
+// Global constants, resources, etc.
+//
 var MessageTypes = {
     Data : {
         LoadOverview: 0x0,
@@ -25,8 +27,9 @@ var MessageTypes = {
     }
 };
 
-/* Simple UI message bus */ 
-
+//
+// Simple UI message bus
+//
 var MessageBus = function(){
     var _listeners = [];
 
@@ -49,75 +52,100 @@ var MessageBus = function(){
 
 };
 
-/* Data model / methods */
-
+//
+// Data model / methods
+//
 var DataModel = function(msgBus){
     var _bus = msgBus;
     var _self = this;
     var _msgMap = {};
 
+    // Loads the dashboard data stream (if any)
     var loadOverview = function(callback){
         var blobServiceUri = 'https://homecenter0628.blob.core.windows.net', 
             container = 'mam',
             now = new Date();
 
+        // Gather up date parts
         var year = now.getUTCFullYear(),
             month = (now.getUTCMonth() + 1).toString().leftPad(2, '0'),
             day = now.getUTCDate().toString().leftPad(2, '0'),
             hour = now.getUTCHours().toString().leftPad(2, '0');
 
+        // Build search URL (see storage REST API docs)
         var lastHourDataPrefix = 'ouput/' + year + '/' + month + '/' + day + '/' + hour;
-        var searchUrl = blobServiceUri + '/' + container + '?restype=container&comp=list&prefix=' + lastHourDataPrefix;
+        var searchUrl = blobServiceUri + 
+                        '/' + 
+                        container + 
+                        '?restype=container&comp=list&prefix=' + 
+                        lastHourDataPrefix;
 
-        // Find the file that matches this prefix (if any)
-        $.ajax({
-            type: 'GET',
-            cache: false,
-            url: searchUrl,
-            contentType : 'xml',
-            success: function(result){
-                var matches = result.documentElement.getElementsByTagName("Blob");
-                if (matches.length > 0){
-                    var downloadUri = matches[0].getElementsByTagName("Url")[0].textContent;
+        // Search for blobs matching the current query (assumes only one)
+        var searchForMatchingData = function(searchUri){
+            $.ajax({
+                type: 'GET',
+                cache: false,
+                url: searchUri,
+                contentType : 'xml',
+                success: function(result){
+                    var matches = result.documentElement.getElementsByTagName("Blob");
+                    if (matches.length > 0){
+                        var downloadUri = matches[0].getElementsByTagName("Url")[0].textContent;
+                        downloadData(downloadUri);
+                    } else {
+                        // Notify application that no current data has been found
+                        console.log('No matches found for the current query');
+                        _bus.Send(MessageTypes.View.NoDataFound);
 
-                    $.ajax({
-                        type: 'GET',
-                        cache: false,
-                        url: downloadUri,
-                        contentType : 'text/plain',
-                        success: function(result){
-                            var lines = result.split('\n');
-                            var data = [];
-                            for (var i=0; i < lines.length; i++){
-                                data.push(JSON.parse(lines[i]));
-                            }
-                            _bus.Send(MessageTypes.Data.OverviewLoaded, data);
-                        }
-                    })
-                } else {
-                    console.log('No matches found for the current query');
-                    _bus.Send(MessageTypes.View.NoDataFound);
-
-                    // Look for new data in 5 seconds
-                    setTimeout(function(){
-                        _bus.Send(MessageTypes.Data.LoadOverview);
-                    }, 5000);
+                        // Look for new data in 15 seconds
+                        setTimeout(function(){
+                            _bus.Send(MessageTypes.Data.LoadOverview);
+                        }, 15000);
+                    }
                 }
-            }
-        })
+            })
+        };
+
+        // Download data file
+        var downloadData = function(dataUri){
+            $.ajax({
+                type: 'GET',
+                cache: false,
+                url: dataUri,
+                contentType : 'text/plain',
+                success: function(result){
+                    // construct an array of data since the file is
+                    // just line-seperated.
+                    var lines = result.split('\n');
+                    var data = [];
+                    for (var i=0; i < lines.length; i++){
+                        data.push(JSON.parse(lines[i]));
+                    }
+
+                    // Notify application that data has been loaded
+                    _bus.Send(MessageTypes.Data.OverviewLoaded, data);
+                }
+            })
+        };
+
+        // Look for matching data streams
+        searchForMatchingData(searchUrl);
     };
 
+    // Invoked when a message is broadcast
     this.OnMessage = function(msg, data){
         var handler = _msgMap[msg];
         if (handler) handler(data);
     };
 
+    // Setup msg handling
     _msgMap[MessageTypes.Data.LoadOverview] = loadOverview;
     _bus.Register(_self.OnMessage);
 };
 
-/* Application controller */
-
+//
+// Application Controller
+//
 var Controller = function(msgBus){
     var _bus = msgBus;
     var _self = this;
@@ -129,17 +157,17 @@ var Controller = function(msgBus){
     };
 
     var displayOverview = function(data){
+        // This is NOT efficient...can be done in a single reduce call.
         var avgTemp = data.reduce(function(p, c) { return p + c.temp; }, 0.0) / data.length,
             tempData = data.reduce(function(p, c) { p.push(c.temp); return p;}, []),
             avgHmdt = data.reduce(function(p, c) { return p + c.hmdt; }, 0.0) / data.length,
             hmdtData = data.reduce(function(p, c) { p.push(c.hmdt); return p;}, []);
         
+        // Adjust UI state
         hideAllContent();
         _host('#content #overview').show();
-        _host('#overview #tempOverview .readings').html('Avg: ' + avgTemp.toFixed(1) + '&deg;');
-        _host('#overview #humidOverview .readings').text('Avg: ' + avgHmdt.toFixed(1) + '%');
 
-        // make some charts
+        // Populate temp and humidity line graphs
         new Highcharts.Chart({
             chart: {
                 renderTo: 'tempGraph', 
@@ -171,11 +199,12 @@ var Controller = function(msgBus){
                 }
             },
             legend: { enabled: false },
-            series: [
-                { animation: false, data: tempData},
-            ]
+            series: [{ 
+                animation: false,
+                color: '#606060', 
+                data: tempData
+            }]
         });
-
         new Highcharts.Chart({
             chart: {
                 renderTo: 'humidGraph', 
@@ -184,7 +213,7 @@ var Controller = function(msgBus){
                 backgroundColor: 'rgb(245,245,245)'
             },
             credits: { enabled: false },
-            title: { text: null },
+            title: null,
             plotOptions: {
                 column: { shadow: false },
                 spline: {
@@ -207,9 +236,137 @@ var Controller = function(msgBus){
                 }
             },
             legend: { enabled: false },
-            series: [
-                { animation: false, data: hmdtData}
-            ]
+            series: [{ 
+                animation: false,
+                color: '#606060', 
+                data: hmdtData
+            }]
+        });
+
+        // Populate Gauge plots
+        new Highcharts.Chart({
+            chart: {
+                renderTo: 'tempGauge',
+                type: 'solidgauge',
+                animation: false,
+                backgroundColor: 'rgb(245,245,245)'
+            },
+            credits: { enabled: false },
+            title: null,
+            pane: {
+                center: ['50%', '85%'],
+                size: '140%',
+                startAngle: -90,
+                endAngle: 90,
+                background: {
+                    backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+                    innerRadius: '60%',
+                    outerRadius: '100%',
+                    shape: 'arc'
+                }
+            },
+            tooltip: { enabled: false },
+            // the value axis
+            yAxis: {
+                stops: [
+                    [0.5, '#55BF3B'], // green
+                    [0.75, '#DDDF0D'], // yellow
+                    [0.9, '#DF5353'] // red
+                ],
+                lineWidth: 0,
+                minorTickInterval: null,
+                tickPixelInterval: 400,
+                tickWidth: 0,
+                title: {
+                    y: -70,
+                    text: 'Avg. Tempurature'
+                },
+                labels: {
+                    y: 16
+                },
+                min: 0,
+                max: 200
+            },
+            plotOptions: {
+                solidgauge: {
+                    dataLabels: {
+                        y: 5,
+                        borderWidth: 0,
+                        useHTML: true
+                    }
+                }
+            },
+            series: [{
+                animation: false,
+                name: 'Tempurature',
+                data: [avgTemp],
+                dataLabels: {
+                    format: '<div style="text-align:center"><span style="font-size:1.75em;">{y:.1f}</span><br/>' +
+                        '<span style="font-size:12px;color:silver">&deg;F</span></div>'
+                }
+            }]
+        });
+        new Highcharts.Chart({
+            chart: {
+                renderTo: 'hmdtGauge',
+                type: 'solidgauge',
+                animation: false,
+                backgroundColor: 'rgb(245,245,245)'
+            },
+            credits: { enabled: false },
+            title: null,
+            pane: {
+                center: ['50%', '85%'],
+                size: '140%',
+                startAngle: -90,
+                endAngle: 90,
+                background: {
+                    backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+                    innerRadius: '60%',
+                    outerRadius: '100%',
+                    shape: 'arc'
+                }
+            },
+            tooltip: { enabled: false },
+            // the value axis
+            yAxis: {
+                stops: [
+                    [0.5, '#55BF3B'], // green
+                    [0.75, '#DDDF0D'], // yellow
+                    [0.9, '#DF5353'] // red
+                ],
+                lineWidth: 0,
+                minorTickInterval: null,
+                tickPixelInterval: 400,
+                tickWidth: 0,
+                title: {
+                    y: -70,
+                    text: 'Avg. Humidity'
+                },
+                labels: {
+                    y: 16
+                },
+                min: 0,
+                max: 100
+            },
+            plotOptions: {
+                solidgauge: {
+                    dataLabels: {
+                        y: 5,
+                        borderWidth: 0,
+                        useHTML: true
+                    }
+                }
+            },
+            series: [{
+                animation: false,
+                name: 'Humidity',
+                data: [avgHmdt],
+                dataLabels: {
+                    format: '<div style="text-align:center"><span style="font-size:1.75em;">{y:.1f}</span><br/>' +
+                        '<span style="font-size:12px;color:silver">%</span></div>'
+                }
+            }]
         });
 
         // Re-load data in 5 seconds
@@ -261,8 +418,9 @@ var Controller = function(msgBus){
     _bus.Register(_self.OnMessage);
 };
 
-/* Startup + bootstrap */
-
+//
+// Application startup & bootstrapping
+//
 $(function(){
     var bus = new MessageBus();
     var data = new DataModel(bus);

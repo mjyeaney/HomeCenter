@@ -11,33 +11,38 @@ body {
 }
 ul { list-style-type: none; }
 h1, h2, h3, h4, h5, h6 { font-weight: normal; }
-a, a:hover, a:visited, a:active { text-decoration: none; color: #eee; }
+a, a:hover, a:visited, a:active { text-decoration: none; color: #000; }
+.fRight { float: right; }
+.fLeft { float: left; }
 .clearFix { clear: both; }
 
 /* App basics */
-#header { background-color: #444; color: #fafafa; padding: .5em; border-bottom: 1px solid #d0d0d0; }
-#header h3 { float: right; background: url(../images/houses.png) no-repeat left center; padding-left: 2.25em; font-size: 1.25em; font-weight: 300;}
+#header { background-color: #fff; color: #333; padding: .5em .15em; border-bottom: 1px solid #505050; }
+#header h3 { float: right; background: url(../images/houses.png) no-repeat left center; padding-left: 2em; font-size: 1.25em; }
 #navigation { 
     overflow: hidden;
-    background-color: #0F74CA;
+    background-color: #d0d0d0;
     border-bottom: 1px solid #505050;
     padding: 0 .75em 0 .75em;
 }
-#navigation li { padding: .5em 0 .5em 0; margin: 0 2em 0 0; cursor: pointer; display: inline-block; font-weight: 300;}
+#navigation li { padding: .5em 0 .5em 0; margin: 0 2em 0 0; cursor: pointer; display: inline-block; }
 #navigation li.dashboard { background: url(../images/overview.png) no-repeat -.5em center; padding-left: 2em; }
 #navigation li.sensors { background: url(../images/sensors.png) no-repeat -.5em center; padding-left: 2em; }
 #navigation li.alerts { background: url(../images/alerts.png) no-repeat -.5em center; padding-left: 2em; margin-right: 0; }
 #content { padding: .5em;}
 
-.graphContainer { margin-bottom: 1em; height: 12em; }
+.graphContainer { margin-bottom: 1em; height: 12em; width: 50%; }
+.gaugeContainer { margin-bottom: 1em; height: 12em; width: 50%; }
 .content-stage { display: none;  }
-.titleSegmentContainer { margin-bottom: 1em; }
-.titleSegmentContainer h2 { float: left; font-size: 1.2em; }
-.titleSegmentContainer .readings { float: right; margin-right: 1em; font-size: 1.2em; }
+.content-stage h2 { font-size: 1.2em; margin-bottom: 1em; font-weight: normal;}
 
 @media (max-width: 570px) {
     #header { text-align: center; }
     #header h3 { display: inline-block; float: none;  }
     #navigation { text-align: center; }
     #navigation li { width: 0; overflow: hidden;}
+    .graphContainer.fLeft { float: none; width: 100%; }
+    .graphContainer.fRight { float: none; width: 100%; }
+    .gaugeContainer.fLeft { float: none; width: 100%; }
+    .gaugeContainer.fRight { float: none; width: 100%; }
 }
