@@ -21,8 +21,8 @@ eventHubs.init({
 var sendReadingData = function(){
     // Create device message
     var deviceMessage = {
-        hmdt: (25 + (Math.random() * 20)),
-        temp: (60 + (Math.random() * 25)),
+        hmdt: (35 + (Math.random() * 20)),
+        temp: (70 + (Math.random() * 25)),
         device: 'ABC-123'
         //time: moment().toISOString()
     }

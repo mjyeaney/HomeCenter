@@ -157,11 +157,24 @@ var Controller = function(msgBus){
     };
 
     var displayOverview = function(data){
-        // This is NOT efficient...can be done in a single reduce call.
-        var avgTemp = data.reduce(function(p, c) { return p + c.temp; }, 0.0) / data.length,
-            tempData = data.reduce(function(p, c) { p.push(c.temp); return p;}, []),
-            avgHmdt = data.reduce(function(p, c) { return p + c.hmdt; }, 0.0) / data.length,
-            hmdtData = data.reduce(function(p, c) { p.push(c.hmdt); return p;}, []);
+        var tempSum = 0.0,
+            hmdtSum = 0.0,
+            avgTemp = 0.0,
+            avgHmdt = 0.0, 
+            tempData = [], 
+            hmdtData = [];
+
+        // Compute aggregates
+        for (var j=0; j < data.length; j++){
+            tempSum += data[j].temp;
+            hmdtSum += data[j].hmdt;
+            tempData.push(data[j].temp);
+            hmdtData.push(data[j].hmdt);
+        }
+
+        // Compute avg's
+        avgTemp = tempSum / data.length;
+        avgHmdt = hmdtSum / data.length;
         
         // Adjust UI state
         hideAllContent();
