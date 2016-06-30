@@ -12,7 +12,7 @@ There are 3 main pieces to this system:
 + Stream Analytics transform job to window the data streams.
 + Web application to display real-time updates of windowed data.
 
-![ArchitectureDiagram](HomeCenter.png)
+![ArchitectureDiagram](diagram.png)
 
 Web Interface
 --------
