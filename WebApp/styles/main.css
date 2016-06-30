@@ -37,9 +37,9 @@ a, a:hover, a:visited, a:active { text-decoration: none; color: #000; }
 .content-stage { display: none;  }
 .content-stage h2 { font-size: 1.2em; margin-bottom: 1em; font-weight: normal;}
 
-@media (min-width: 1270px) {
-.graphContainer { width: 75%; }
-.gaugeContainer { width: 25%; }
+@media (min-width: 1200px) {
+    .graphContainer { width: 75%; }
+    .gaugeContainer { width: 25%; }
 }
 
 @media (max-width: 570px) {
