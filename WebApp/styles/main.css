@@ -44,7 +44,7 @@ a, a:hover, a:visited, a:active { text-decoration: none; color: #000; }
 
 @media (max-width: 570px) {
     #header { text-align: center; }
-    #header h3 { display: inline-block; float: none;  }
+    #header h3 { display: inline-block; float: none; background: none; padding-left: 0; }
     #navigation { text-align: center; }
     #navigation li { width: 0; overflow: hidden;}
     .graphContainer.fLeft { float: none; width: 100%; }
