@@ -25,7 +25,7 @@ var sendReadingData = function(){
         temp: (70 + (Math.random() * 25)),
         device: 'ABC-123'
         //time: moment().toISOString()
-    }
+    };
 
     // Send message
     eventHubs.sendMessage({
