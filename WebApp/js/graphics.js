@@ -17,7 +17,7 @@
                 renderTo: domElm, 
                 type: 'line', 
                 animation: false,
-                backgroundColor: 'rgb(245,245,245)'
+                backgroundColor: '#fff'
             },
             credits: { enabled: false },
             title: { text: null },
@@ -60,7 +60,7 @@
                 renderTo: domElm,
                 type: 'solidgauge',
                 animation: false,
-                backgroundColor: 'rgb(245,245,245)'
+                backgroundColor: '#fff'
             },
             credits: { enabled: false },
             title: null,
@@ -70,7 +70,7 @@
                 startAngle: -90,
                 endAngle: 90,
                 background: {
-                    backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+                    backgroundColor: '#f6f6f6',
                     innerRadius: '60%',
                     outerRadius: '100%',
                     shape: 'arc'
