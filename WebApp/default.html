@@ -62,5 +62,20 @@
         <script type="text/javascript" src="//code.highcharts.com/modules/solid-gauge.js"></script>
         <script type="text/javascript" src="/js/graphics.js?ver=1.34"></script>
         <script type="text/javascript" src="/js/app-main.js?ver=1.34"></script>
+
+        <script type="text/javascript">
+            //
+            // Application startup & bootstrapping
+            //
+            $(function(){
+                var bus = new App.MessageBus();
+                var data = new App.DataModel(bus);
+                var view = new App.Controller(bus);
+                view.BindEvents($);
+                
+                // startup
+                bus.Send(App.MessageTypes.Data.LoadOverview);
+            });
+        </script>
     </body>
 </html>
