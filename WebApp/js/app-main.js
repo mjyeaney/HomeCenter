@@ -100,7 +100,7 @@ var DataModel = function(msgBus){
                         // Look for new data in 15 seconds
                         setTimeout(function(){
                             _bus.Send(MessageTypes.Data.LoadOverview);
-                        }, 15000);
+                        }, 5000);
                     }
                 }
             })
