@@ -69,7 +69,7 @@
             var app = {};
 
             $(function(){
-                app.bus = new App.MewssageBus();
+                app.bus = new App.MessageBus();
                 app.model = new App.DataModel(app.bus);
                 app.controller = new App.Controller(app.bus);
                 app.controller.BindEvents($);
