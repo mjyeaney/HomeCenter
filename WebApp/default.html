@@ -70,8 +70,8 @@
             $(function(){
                 var bus = new App.MessageBus();
                 var data = new App.DataModel(bus);
-                var view = new App.Controller(bus);
-                view.BindEvents($);
+                var controller = new App.Controller(bus);
+                controller.BindEvents($);
                 
                 // startup
                 bus.Send(App.MessageTypes.Data.LoadOverview);

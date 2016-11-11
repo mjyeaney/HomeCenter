@@ -47,7 +47,7 @@ var sendReadingData = function(){
 var scheduleReading = function(){
     setTimeout(function(){
         sendReadingData();
-    }, 500);
+    }, 0);
 };
 
 // Startup

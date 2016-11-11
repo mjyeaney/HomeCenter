@@ -42,12 +42,16 @@ if (!String.prototype.leftPad) {
     var MessageBus = function(){
         var _listeners = [];
 
+        var _defer = function(callback){
+            window.setTimeout(callback, 0);
+        }
+
         this.Register = function(callback){
             _listeners.push(callback);
         }
 
         this.Send = function(msg, data){
-            window.setTimeout(function(){
+            _defer(function(){
                 for (var j=0; j < _listeners.length; j++){
                     try {
                         _listeners[j](msg, data);
@@ -56,7 +60,7 @@ if (!String.prototype.leftPad) {
                         console.log('ERROR: ' + ex)
                     }
                 }
-            }, 0);
+            });
         };
     };
 
