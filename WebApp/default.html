@@ -66,14 +66,16 @@
             //
             // Application startup & bootstrapping
             //
+            var app = {};
+
             $(function(){
-                var bus = new App.MessageBus();
-                var data = new App.DataModel(bus);
-                var controller = new App.Controller(bus);
-                controller.BindEvents($);
+                app.bus = new App.MewssageBus();
+                app.model = new App.DataModel(app.bus);
+                app.controller = new App.Controller(app.bus);
+                app.controller.BindEvents($);
                 
                 // startup
-                bus.Send(App.MessageTypes.Data.LoadOverview);
+                app.bus.Send(App.MessageTypes.Data.LoadOverview);
             });
         </script>
     </body>
